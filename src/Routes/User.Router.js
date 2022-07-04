@@ -20,11 +20,11 @@ userRouter.route('/').get(
    getAllUsers
 )
 
-userRouter.route('/showMe').get(showCurrentUser)
+userRouter.route('/showMe').get(authenticateUser, showCurrentUser)
 
 userRouter.route('/updateUser').patch(updateUser)
 
-userRouter.route('/updateUserPassword').patch(updateUserPassword); 
+userRouter.route('/updateUserPassword').patch(authenticateUser, updateUserPassword); 
 
 userRouter.route('/:id').get(authenticateUser, getOneUser)
 
