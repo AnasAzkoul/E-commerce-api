@@ -17,38 +17,21 @@ const {
 
 const productRouter = express.Router(); 
 
-productRouter.route('/').get(getAllProducts); 
-
-productRouter.post(
-   '/createProduct', 
-   authenticateUser,
-   authorizePermissions('admin'),
-   createProduct
-)
-
-
-productRouter.patch(
-   '/updateProduct',
-   authenticateUser,
-   authorizePermissions('admin'),
-   updateProduct
-)
-
-productRouter.delete(
-   '/deleteProduct',
-   authenticateUser,
-   authorizePermissions('admin'),
-   deleteProduct,
-)
+productRouter
+   .route('/')
+   .get(getAllProducts)
+   .post([authenticateUser, authorizePermissions('admin')], createProduct)
 
 productRouter.route('/uploadImage').post(
    authenticateUser,
    authorizePermissions('admin'),
    uploadImage
 )
-
-productRouter.route('/:productId').get(getSingleProduct)
-
-
+   
+productRouter
+   .route('/:productId')
+   .get(getSingleProduct)
+   .patch([authenticateUser,authorizePermissions('admin')],updateProduct)
+   .delete([authenticateUser, authorizePermissions('admin')], deleteProduct)
 
 module.exports = productRouter
