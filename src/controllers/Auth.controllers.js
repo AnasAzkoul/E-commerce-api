@@ -6,7 +6,8 @@ const {
 } = require('../errors'); 
 const {
    createToken,
-   attachCookiesToResponse
+   attachCookiesToResponse, 
+   createUserToken
 } = require('../utils'); 
 
 const register = async (req, res) => {
@@ -23,15 +24,10 @@ const register = async (req, res) => {
 
    const user = await User.create({ name, email, password, role }); 
 
-   const userPayload = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-   }
+   const userToken = createUserToken(user); 
    
-   attachCookiesToResponse(res, userPayload); 
-   res.status(StatusCodes.CREATED).json({user: userPayload}); 
+   attachCookiesToResponse(res, userToken); 
+   res.status(StatusCodes.CREATED).json({user: userToken}); 
 }
 
 const logIn = async (req, res) => {
@@ -48,16 +44,11 @@ const logIn = async (req, res) => {
    if (!isPasswordValid) {
       throw new UnauthenticatedError('Password is not valid'); 
    }
-   const userPayload = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-   }
+   const userToken = createUserToken(user);
 
-   attachCookiesToResponse(res, userPayload); 
+   attachCookiesToResponse(res, userToken); 
 
-   res.status(StatusCodes.OK).json(userPayload); 
+   res.status(StatusCodes.OK).json(userToken); 
 }
 
 const logOut = async (req, res) => {

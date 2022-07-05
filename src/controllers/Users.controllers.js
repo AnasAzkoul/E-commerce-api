@@ -1,6 +1,7 @@
 const User = require('../models/User.model'); 
 const CustomError = require('../errors'); 
 const { StatusCodes } = require('http-status-codes'); 
+const Utils = require('../utils'); 
 
 
 const getAllUsers = async (req, res) => {
@@ -14,15 +15,30 @@ const getOneUser = async (req, res) => {
    if (!user) {
       throw new CustomError.NotFoundError('This user doe not exist, please provide a valid Id'); 
    }
+   Utils.checkPermissions(req.user, user._id)
    res.status(StatusCodes.OK).json(user);
 }
 
 const showCurrentUser = async (req, res) => {
    res.status(StatusCodes.OK).json({user: req.user})
 }
+// update user using User.save()
+const updateUser = async (req, res) => {
+   const { email, name } = req.body
+   if (!email || !name) {
+      throw new CustomError.BadRequestError('Please Provide name and Email'); 
+   }
 
-const updateUser = (req, res) => {
-   res.send('user Updated');
+   try {
+      const user = await User.findOne({ _id: req.user.id }); 
+      user.name = name; 
+      user.email = email; 
+      const userToken = Utils.createUserToken(user); 
+      Utils.attachCookiesToResponse(res, userToken);
+      res.status(StatusCodes.OK).json(userToken); 
+   } catch (error) {
+      throw new CustomError.NotFoundError('User does not exist'); 
+   }
 }
 
 const updateUserPassword = async (req, res) => {
@@ -48,3 +64,19 @@ module.exports = {
    updateUser, 
    updateUserPassword, 
 }
+// update user using findOneAndUpdate 
+// const updateUser = async (req, res) => {
+//    const { email, name } = req.body
+//    if (!email || !name) {
+//       throw new CustomError.BadRequestError('Please Provide name and Email');
+//    }
+
+//    const user = await User.findOneAndUpdate(
+//       { _id: req.user.id },
+//       { email, name },
+//       { new: true, runValidators: true }
+//    )
+//    const userToken = Utils.createUserToken(user);
+//    Utils.attachCookiesToResponse(res, userToken);
+//    res.status(StatusCodes.OK).json(userToken);
+// }
