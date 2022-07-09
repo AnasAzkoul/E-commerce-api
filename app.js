@@ -1,11 +1,12 @@
 const express = require('express'); 
 require('dotenv').config(); 
 require('express-async-errors'); 
-// Middlewares 
+// Middleware 
 const morgan = require('morgan'); 
 const helmet = require('helmet'); 
 const cors = require('cors'); 
 const cookieParser = require('cookie-parser'); 
+const fileUpload = require('express-fileupload')
 // custom middleware 
 const errorHandlerMiddleware = require('./src/middleware/error-handler'); 
 const notFoundMiddleware = require('./src/middleware/not-found'); 
@@ -18,13 +19,14 @@ const productRouter = require('./src/Routes/Product.Router')
 
 const app = express(); 
 
-// Middlewares 
+// Middleware 
 app.use(express.json()); 
 app.use(cookieParser(process.env.SECRET_JWT))
 app.use(helmet()); 
 app.use(cors()); 
 app.use(morgan('combined')); 
 app.use(express.static('./public')); 
+app.use(fileUpload())
 
 // Routes
 app.get('/', (req, res) => {
@@ -43,7 +45,7 @@ app.use(errorHandlerMiddleware);
 
 
 // Server and MongoDb setup 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 3000
 
 const MONGO_URI = process.env.MONGO_URI; 
 
