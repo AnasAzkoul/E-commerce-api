@@ -14,6 +14,8 @@ const {
    uploadImage
 } = require('../controllers/Product.controller'); 
 
+const {getSingleProductReviews} = require('../controllers/Review.controller')
+
 
 const productRouter = express.Router(); 
 
@@ -33,5 +35,7 @@ productRouter
    .get(getSingleProduct)
    .patch([authenticateUser,authorizePermissions('admin')],updateProduct)
    .delete([authenticateUser, authorizePermissions('admin')], deleteProduct)
+
+productRouter.route('/:productId/reviews').get(getSingleProductReviews); 
 
 module.exports = productRouter
